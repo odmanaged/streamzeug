@@ -1,0 +1,53 @@
+#used in influxDB application level reporting
+identifier: APPID
+#optional influxDB setttings (if defined url MUST be non-empty)
+influxdb:
+  url: ""
+  token: ""
+  org: ""
+  bucket: ""
+  #when non-empty overrides default measurement name of "srt"
+  srt:
+  #when non-empty override default measurement name of "rist-receive"
+  ristrx:
+  #when non-empty override default measurement name of "rist-sender"
+  risttx:
+  #when non-empty override default measurement name of "streamzeug"
+  application:
+#optional (ip):port if defined http server will be spun, serving /status page
+listenhttp: :8080
+flows:
+    #Flow identifer, used in logs & influxDB stats
+  - identifier: TESTFLOW
+    #Must be RIST
+    type: RIST
+    #valid: 0 (simple), 1 (main)
+    ristprofile: 0
+    #may be 0, defaults to 1000
+    latency: 1000
+    #must be smaller than uint16_t max (65535), rist main profile only
+    streamid: 0
+    #multiple can be used for loadbalanced RIST input
+    inputs:
+      - url: rist://@239.168.88.130:14400
+        #identifier is not used atm for input
+        identifier: INPUTID
+    outputs:
+      - identifier: OUTPUTID
+        #output url may be udp://, rtp://, or srt://
+        #srt options passed as url param
+        #for udp/rtp the following URL params exist:
+          #iface, interface name OR ip adres(:port)
+          #float, treat udp output as "floating", i.e. when keepalived is
+          #       managing the source IP adres
+          #ttl    multicast ttl (defaults to 255)
+        url: udp://239.168.88.134:5000?iface=192.168.88.130&float=true
+      - identifier: OUTPUTID
+        url: srt://0.0.0.0:1234?mode=listener&passphrase=12345678910
+    #minimal bitrate, below which status flips to NOT-OK
+    minimalbitrate: 16000000
+    #max ms between packets, over which status flips to NOT-OK
+    maxpackettime: 100
+    #stats settings, these are not updated on config reload!
+    statsstdout: false
+    statsfile: ""

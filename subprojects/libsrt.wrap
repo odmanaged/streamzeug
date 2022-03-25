@@ -1,0 +1,7 @@
+[wrap-git]
+directory = srt
+url = https://github.com/Haivision/srt.git
+revision = v1.4.4
+
+[provide]
+dependency_names = srt 
